@@ -34,18 +34,20 @@
 </script>
 <style lang="stylus">
   @import './common/stylus/mixin.styl'
+  @import './common/stylus/base.styl'
+  
   .tab
     display: flex
     width: 100%
     height: 40px
     line-height: 40px
-    // border-bottom: 1px solid rgba(7, 17, 27, 0.1)
-    border-bottom-1px(rgba(7, 17, 27, 0.1))
+    // border-bottom: 1px solid $color-line
+    border-bottom-1px($color-line)
     .tab-item
       flex: 1
       text-align: center
       color: rgb(77, 85, 93)
       font-size: 14px
       &.active
-       color: rgb(240, 20, 20)
+       color: $color-red
 </style>
