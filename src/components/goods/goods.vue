@@ -1,47 +1,54 @@
 <template>
     <div class="goods-body">
-    	<div class="menu-wrap">
+    	<div class="menu-wrap" ref="menuWrap">
     		<ul>
     			<li v-for="item in goods">
     				<span>{{item.name}}</span>
     			</li>
+    			<li class="place-footer"></li>
     		</ul>
     	</div>
-    	<div class="goods-wrap">
-    		<div class="goods-list" v-for="foods_item in goods">
-    			<p class="goods-title">{{foods_item.name}}</p>
-    			<ul>
-    				<li v-for="food in foods_item.foods" class="food-info">
-    					<img :src="food.image" class="food-img">
-    					<div class="text-info">
-    						<p class="name">{{food.name}}</p>
-    						<p class="descript" v-if="food.description">{{food.description}}</p>
-    						<p class="data">
-    							<span class="sellCount">月售{{food.sellCount}}份</span>
-    							<span class="rating">好评率{{food.rating}}%</span>
-    						</p>
-    						<p class="prices">
-    							<span class="price">￥{{food.price}}</span>
-    							<span class="oldPrice" v-if="food.oldPrice">￥{{food.oldPrice}}</span>
-    						</p>
-    					</div>
-    					<div class="add-sub-box">
-    						<span class="add icon-add_circle"></span>
-    						<span class="add icon-remove_circle_outline"></span>
-    					</div>
-    				</li>
-    			</ul>
-    		</div>
+    	<div class="goods-wrap" ref="goodsWrap">
+    		<ul class="goods-list">
+    			<li v-for="foods_item in goods" class="goods-item">
+	    			<p class="goods-title">{{foods_item.name}}</p>
+	    			<ul class="foods-list">
+	    				<li v-for="food in foods_item.foods" class="food-item">
+	    					<img :src="food.image" class="food-img">
+	    					<div class="text-info">
+	    						<p class="name">{{food.name}}</p>
+	    						<p class="descript" v-if="food.description">{{food.description}}</p>
+	    						<p class="data">
+	    							<span class="sellCount">月售{{food.sellCount}}份</span>
+	    							<span class="rating">好评率{{food.rating}}%</span>
+	    						</p>
+	    						<p class="prices">
+	    							<span class="price">￥{{food.price}}</span>
+	    							<span class="oldPrice" v-if="food.oldPrice">￥{{food.oldPrice}}</span>
+	    						</p>
+	    					</div>
+	    					<!-- <div class="add-sub-box">
+	    						<span class="add icon-add_circle"></span>
+	    						<span class="sub icon-remove_circle_outline"></span>
+	    					</div> -->
+	    				</li>
+	    			</ul>
+    			</li>
+    			<li class="place-footer"></li>
+    		</ul>
     	</div>
     </div>
 </template>
 <script>
+	import BScroll from 'better-scroll'
+
 	const ERR_OK = 0
 
 	export default {
 		data () {
 			return {
-				goods: []
+				goods: [],
+				goodsHeightList: []
 			}
 		},
 		created () {
@@ -49,8 +56,25 @@
 				response = response.body
 				if (response.errno === ERR_OK) {
 					this.goods = response.data
+					this.$nextTick(() => {
+						this.initScroll()
+					})
 				}
 			})
+		},
+		methods: {
+			initScroll () {
+				this.menuScroll = new BScroll(this.$refs.menuWrap)
+				this.goodsScroll = new BScroll(this.$refs.goodsWrap)
+				let height = 0
+				let goodsDom = this.$refs.goodsWrap.getElementsByClassName('goods-item')
+
+				this.goodsHeightList.push(height)
+				for (let i = 0; i < goodsDom.length; i++) {
+					height += dom.clientHeight
+					this.goodsHeightList.push(height)
+				}
+			}
 		}
 	}
 </script>
@@ -62,11 +86,10 @@
 		.menu-wrap
 			width: 80px
 			background-color: $color-silver
-			padding-bottom: $footer-height
 			position: absolute
 			top: 176px
 			bottom: 0px
-			overflow: auto
+			overflow: hidden
 			ul
 				font-size: 12px
 				line-height: 14px
@@ -87,8 +110,7 @@
 			right: 0px
 			top: 176px
 			bottom: 0px
-			padding-bottom: $footer-height
-			overflow: auto
+			overflow: hidden
 			
 			.goods-list
 				.goods-title
@@ -98,7 +120,7 @@
 					line-height: 26px
 					border-left: 2px solid #d9dde1
 					padding: 0 14px
-				.food-info
+				.food-item
 					display: flex
 					margin: 18px 18px 0
 					padding-bottom: 18px
@@ -128,7 +150,7 @@
 							text-overflow: ellipsis
 						.data
 							.sellCount
-								margin-right: 10px	
+								margin-right: 10px
 						.prices
 							margin-top: 8px
 							line-height: 14px
@@ -141,4 +163,6 @@
 							.oldPrice
 								color: $color-font1
 								text-decoration: line-through
+		.place-footer
+			height: $footer-height
 </style>
