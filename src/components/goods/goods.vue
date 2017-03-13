@@ -2,7 +2,7 @@
     <div class="goods-body">
     	<div class="menu-wrap" ref="menuWrap">
     		<ul>
-    			<li v-for="item in goods">
+    			<li v-for="(item, index) in goods" @click="jump2Goods(index, $event)" :class="{'active': curMenuIndex === index}">
     				<span>{{item.name}}</span>
     			</li>
     			<li class="place-footer"></li>
@@ -48,7 +48,10 @@
 		data () {
 			return {
 				goods: [],
-				goodsHeightList: []
+				goodsHeightList: [],
+				menuScroll: {},
+				goodsScroll: {},
+				curMenuIndex: 0
 			}
 		},
 		created () {
@@ -57,23 +60,54 @@
 				if (response.errno === ERR_OK) {
 					this.goods = response.data
 					this.$nextTick(() => {
-						this.initScroll()
+						this._initScroll()
 					})
 				}
 			})
 		},
 		methods: {
-			initScroll () {
-				this.menuScroll = new BScroll(this.$refs.menuWrap)
-				this.goodsScroll = new BScroll(this.$refs.goodsWrap)
+			_initScroll () {
+				this.menuScroll = new BScroll(this.$refs.menuWrap, {
+					click: true
+				})
+				this.goodsScroll = new BScroll(this.$refs.goodsWrap, {
+					probeType: 3
+				})
 				let height = 0
-				let goodsDom = this.$refs.goodsWrap.getElementsByClassName('goods-item')
+				let domList = this.$refs.goodsWrap.getElementsByClassName('goods-item')
 
 				this.goodsHeightList.push(height)
-				for (let i = 0; i < goodsDom.length; i++) {
-					height += dom.clientHeight
+				for (let i = 0; i < domList.length; i++) {
+					height += domList[i].clientHeight
 					this.goodsHeightList.push(height)
 				}
+
+				let _vm = this
+				this.goodsScroll.on('scroll', (pos) => {
+					let height = -pos.y
+					let list = _vm.goodsHeightList
+					for (let i = 0; i < list.length; i++) {
+						if (height >= list[i] && height < list[i + 1]) {
+							_vm.curMenuIndex = i
+							break
+						} else if (height < 0) {
+							_vm.curMenuIndex = 0
+							break
+						} else if (height >= list[list.length - 1]) {
+							_vm.curMenuIndex = list.length - 1
+							break
+						}
+					}
+				})
+			},
+			jump2Goods (index, event) {
+				if (!event._constructed) {
+					// event._constructed是bscroll派发点击事件独有的属性
+					return
+				}
+				let height = this.goodsHeightList[index]
+				this.goodsScroll.scrollTo(0, -height, 500)
+				this.curMenuIndex = index
 			}
 		}
 	}
@@ -94,9 +128,10 @@
 				font-size: 12px
 				line-height: 14px
 				color: rgb(20, 20, 20)
-				width: 56px
+				width: 100%
 				margin: 0 auto
 				li
+					padding: 0 14px
 					height: 54px
 					display: table
 					width: 100%
@@ -104,6 +139,8 @@
 					span
 						display: table-cell
 						vertical-align: middle
+					&.active
+						background-color: white
 		.goods-wrap
 			position: absolute
 			left: 80px
