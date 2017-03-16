@@ -37,10 +37,12 @@
     			<li class="place-footer"></li>
     		</ul>
     	</div>
+    	<shop-cart></shop-cart>
     </div>
 </template>
 <script>
 	import BScroll from 'better-scroll'
+	import shopCart from 'components/shopcart/shopcart'
 
 	const ERR_OK = 0
 
@@ -64,6 +66,9 @@
 					})
 				}
 			})
+		},
+		components: {
+			shopCart
 		},
 		methods: {
 			_initScroll () {
