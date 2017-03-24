@@ -4,15 +4,42 @@
 			<div class="cart-wrap">
 				<span class="icon icon-shopping_cart"></span>
 			</div>
-			<div class="sum-wrap">
-				<span class="sum-price">￥</span>
-				<span class="sum-extra">另需配送费￥</span>
+			<div class="price-wrap">
+				<span class="price-goods">￥{{goodsPrice}}</span>
+				<span class="price-delivery">另需配送费￥{{deliveryPrice}}</span>
 			</div>
 		</div>
-		<div class="shopcart-right">￥10起送</div>
+		<div class="shopcart-right">￥{{minPrice}}起送</div>
 	</div>
 </template>
-<script></script>
+<script>
+	export default {
+		props: {
+			deliveryPrice: {
+				type: Number,
+				default: 0
+			},
+			minPrice: {
+				type: Number,
+				default: 1
+			},
+			goods: {
+				type: Array,
+				default: []
+			}
+		},
+		computed: {
+			goodsPrice () {
+				let sum = 0
+				this.goods.forEach((item) => {
+					sum += item.price * item.count
+				})
+
+				return sum
+			}
+		}
+	}
+</script>
 <style lang="stylus">
 	@import '../../common/stylus/base.styl'
 	
@@ -51,10 +78,17 @@
 					width: 44px
 					height: 44px
 					border-radius: 44px
-			.sum-wrap
+			.price-wrap
 				position: absolute
 				top: 0
 				left: 80px
+				.price-goods, .price-delivery
+					display: inline-block
+					line-height: 24px
+				.price-goods
+					margin-right: 12px
+					padding-right: 12px
+					border-right: 1px solid $font-color
 		.shopcart-right
 			flex: 0 0 105px
 			width: 105px

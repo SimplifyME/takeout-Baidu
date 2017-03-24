@@ -27,17 +27,18 @@
 	    							<span class="oldPrice" v-if="food.oldPrice">￥{{food.oldPrice}}</span>
 	    						</p>
 	    					</div>
-	    					<!-- <div class="add-sub-box">
+	    					<div class="count-ctrl">
 	    						<span class="add icon-add_circle"></span>
+	    						<span class="count"></span>
 	    						<span class="sub icon-remove_circle_outline"></span>
-	    					</div> -->
+	    					</div>
 	    				</li>
 	    			</ul>
     			</li>
     			<li class="place-footer"></li>
     		</ul>
     	</div>
-    	<shop-cart></shop-cart>
+    	<shop-cart :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice" :goods="selectedGoods"></shop-cart>
     </div>
 </template>
 <script>
@@ -50,10 +51,16 @@
 		data () {
 			return {
 				goods: [],
+				selectedGoods: [],
 				goodsHeightList: [],
 				menuScroll: {},
 				goodsScroll: {},
 				curMenuIndex: 0
+			}
+		},
+		props: {
+			seller: {
+				type: Object
 			}
 		},
 		created () {
@@ -76,17 +83,19 @@
 					click: true
 				})
 				this.goodsScroll = new BScroll(this.$refs.goodsWrap, {
-					probeType: 3
+					probeType: 3 //实时检测滚动
 				})
 				let height = 0
 				let domList = this.$refs.goodsWrap.getElementsByClassName('goods-item')
 
+				//每个项目的top值push进数组
 				this.goodsHeightList.push(height)
 				for (let i = 0; i < domList.length; i++) {
 					height += domList[i].clientHeight
 					this.goodsHeightList.push(height)
 				}
 
+				//通过检测滚动距离切换对应的菜单索引
 				let _vm = this
 				this.goodsScroll.on('scroll', (pos) => {
 					let height = -pos.y
@@ -167,6 +176,7 @@
 					margin: 18px 18px 0
 					padding-bottom: 18px
 					border-bottom: 1px solid $color-line
+					position: relative
 					&:last-child
 						border-bottom: none
 					.food-img
@@ -205,6 +215,10 @@
 							.oldPrice
 								color: $color-font1
 								text-decoration: line-through
+					.count-ctrl
+						position: absolute
+						right: 0
+						bottom: 0
 		.place-footer
 			height: $footer-height
 </style>
